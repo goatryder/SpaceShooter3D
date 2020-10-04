@@ -7,6 +7,7 @@
 
 #include "Enemy.h"
 #include "Hazard.h"
+#include "Blueprint/UserWidget.h"
 
 #include "SS_GameMode.generated.h"
 
@@ -45,10 +46,21 @@ public:
 	int32 SpawnTimer;
 	bool bPlayerDead;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void RestartLevel(FName LevelName);
 
 	bool bStart;
+
+	// add widgets
+	
+	UPROPERTY(EditAnywhere, Category = "HUD Elements")
+	TSubclassOf<UUserWidget> Score_Widget_Class;
+
+	UPROPERTY(EditAnywhere, Category = "HUD Elements")
+	TSubclassOf<UUserWidget> Shield_And_Armour_Widget_Class;
+
+	UPROPERTY(EditAnywhere, Category = "HUD Elements")
+	TSubclassOf<UUserWidget> Restart_Widget_Class;
 
 protected:
 	FActorSpawnParameters ActorNoSpawnParameters;
@@ -61,7 +73,13 @@ protected:
 
 	UWorld* ThisWorld;
 
-	// add widgets
-
 	
+	UUserWidget* Score_Widget;
+	
+	UUserWidget* Shield_Armour_Widget;
+
+	UUserWidget* Restart_Widget;
+	
+	APlayerController* PC_Ref;
+
 };

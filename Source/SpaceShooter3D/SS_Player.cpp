@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "SS_Player.h"
+#include "SS_GameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASS_Player::ASS_Player()
@@ -134,7 +135,26 @@ void ASS_Player::Tick(float DeltaTime)
 
 	TimeSinceLastShot += DeltaTime;
 
-}
+	// handle player hit
+	if (bHit) {
+
+		bDead = true;
+
+		ShipMesh->SetVisibility(false);
+		ParticleSystems->SetVisibility(false);
+		
+		ExplosionFX->Activate();
+		DeathExplosionSound->Activate();
+		DeathExplosionSound->Play();
+
+		SetActorTickEnabled(false);
+
+		ASS_GameMode* GameModeREF = Cast<ASS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		GameModeREF->bPlayerDead = true;
+	
+	}
+
+} // tick
 
 // Called to bind functionality to input
 void ASS_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -183,9 +203,78 @@ void ASS_Player::FireWeapon()
 
 void ASS_Player::CollectablePickup()
 {
+
+	if (Current_Armour < 100.0f && Current_Health == 100.0f) {
+
+		Current_Armour += 10.0f;
+
+		if (Current_Armour > 100.0f)
+			Current_Armour = 100.0f;
+
+	}
+	else if (Current_Health < 100.0f) {
+
+		Current_Health += 10.0f;
+
+		if (Current_Health > 100.0f)
+			Current_Health = 100.0f;
+
+	}
+
 }	
 
 
 void ASS_Player::OnBeginOverlap(AActor* PlayerActor, AActor* OtherActor)
 {
+
+	if (OtherActor->ActorHasTag("Asteroid") || OtherActor->ActorHasTag("EnemyShip")) {
+
+		if (Current_Armour > 0.0f) {
+			
+			Current_Armour -= 10.0f;
+		
+			if (Current_Armour < 0.0f)
+				Current_Armour = 0.0f;
+		
+		}
+		
+		else if (Current_Health > 0.0f) {
+
+			Current_Health -= 10.0f;
+
+			if (Current_Health <= 0.0f) {
+
+				Current_Health = 0.0f;
+
+				bHit = true;
+			}
+		}
+
+	} // collide with asteroid, shit
+
+	else if (OtherActor->ActorHasTag("EnemyProjectile")) {
+
+		if (Current_Armour > 0.0f) {
+
+			Current_Armour -= 25.0f;
+
+			if (Current_Armour < 0.0f)
+				Current_Armour = 0.0f;
+
+		}
+
+		else if (Current_Health > 0.0f) {
+
+			Current_Health -= 25.0f;
+
+			if (Current_Health <= 0.0f) {
+
+				Current_Health = 0.0f;
+
+				bHit = true;
+			}
+		}
+
+	} // collide with enemy projectile
+
 }

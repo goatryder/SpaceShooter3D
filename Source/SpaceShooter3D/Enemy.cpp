@@ -29,7 +29,7 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 	
 	// TotalTime = 0.0f;
-	// TImeSinceLastShot = 0.0f;
+	// TimeSinceLastShot = 0.0f;
 	DestroyTimer = 1.0f;
 
 	// bHit = false;

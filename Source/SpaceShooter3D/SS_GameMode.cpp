@@ -33,6 +33,32 @@ void ASS_GameMode::BeginPlay()
 
 	bPlayerDead = false;
 
+	if (Score_Widget_Class) {
+		
+		Score_Widget = CreateWidget<UUserWidget>(ThisWorld, Score_Widget_Class);
+		Score_Widget->AddToViewport();
+
+	} // score widget
+
+	if (Shield_And_Armour_Widget_Class) {
+
+		Shield_Armour_Widget = CreateWidget<UUserWidget>(ThisWorld, Shield_And_Armour_Widget_Class);
+		Shield_Armour_Widget->AddToViewport();
+
+	} // armour and health widget
+
+	if (Restart_Widget_Class) {
+
+		Restart_Widget = CreateWidget<UUserWidget>(ThisWorld, Restart_Widget_Class);
+		Restart_Widget->AddToViewport();
+
+		Restart_Widget->SetVisibility(ESlateVisibility::Hidden);
+
+	} // restart widget
+
+	// get player controller
+	PC_Ref = ThisWorld->GetFirstPlayerController();
+
 }
 
 // Called every frame
@@ -41,8 +67,6 @@ void ASS_GameMode::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	SpawnTimer = FMath::RandRange(0, 1000);
-
-	
 
 	// spawn enemy
 	if (Enemy) {
@@ -87,10 +111,21 @@ void ASS_GameMode::Tick(float DeltaTime)
 
 	}
 
+	// enable restart widget when player is dead
+	if (bPlayerDead) {
+
+		Restart_Widget->SetVisibility(ESlateVisibility::Visible);
+
+		PC_Ref->bShowMouseCursor = true;
+
+		bPlayerDead = false;
+
+	}
+
 }
 
 
 void ASS_GameMode::RestartLevel(FName LevelName)
-{
-
+{	
+	RestartGame();
 }
